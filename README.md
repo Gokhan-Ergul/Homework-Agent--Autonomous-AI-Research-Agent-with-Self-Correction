@@ -50,12 +50,12 @@ Here is a simplified diagram of the core self-correction loop:
 
 ```bash
 /homework_agent
-├── main.ipynb                                      # Main notebook to run the agent
-├── workflow.py                                     # Defines the StateGraph, nodes, and edges
-├── nodes.py                                        # Contains the functions for each agent (Researcher, Writer, etc.)
-├── tools.py                                        # Initializes tools (e.g., TavilySearch)
-├── student_number_homeworkname.docx                # An example result
-└── student_number_homeworkname2.docx               # An example result
+├── main.ipynb                             # Main notebook to run the agent
+├── workflow.py                            # Defines the StateGraph, nodes, and edges
+├── nodes.py                               # Contains the functions for each agent (Researcher, Writer, etc.)
+├── tools.py                               # Initializes tools (e.g., TavilySearch)
+├── long_research_query.docx               # An example result
+└── new_complex_query.docx                 # An example result
 
 ```
 ### 3. How to Use
