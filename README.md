@@ -32,16 +32,23 @@ Here is a simplified diagram of the core self-correction loop:
 
 * **Multi-Agent Collaboration**: Utilizes multiple specialized agents (nodes) working in concert.
 * **Self-Correction**: Implements a reflective loop where one agent critiques another, progressively improving the output quality.
-* **Real-Time Web Research**: Integrated with `TavilySearch` for up-to-date information.
-* **Modular Architecture**: Cleanly separated logic into `state.py`, `tools.py`, `nodes.py`, and `workflow.py` for easy maintenance and extension.
+* **Advanced RAG Integration**: Employs a sophisticated hybrid retrieval system for deep contextual search.
+    * **`BM25Retriever`**: For efficient, keyword-based (sparse) retrieval.
+    * **`EnsembleRetriever`**: Combines `BM25` with a semantic vector search (`SimilarityRetriever`) to get the best of both worlds.
+    * **`MultiQueryRetriever`**: Uses an LLM to generate multiple query variations, maximizing the chance of finding relevant documents (improving recall).
+* **Hybrid Research**: Dynamically uses both real-time web search (`TavilySearch`) and the private RAG database.
+* **Modular Architecture**: Cleanly separated logic into  `tools.py`, `nodes.py`, and `workflow.py` for easy maintenance and extension.
 * **Final Document Generation**: Automatically saves the final report as a `.docx` file using `python-docx`.
-
+  
 ## 🛠️ Tech Stack
 
 * **LangGraph**: The core library for building stateful, multi-agent applications.
-* **LangChain**: For core abstractions and tool integration.
+* **LangChain**: For core abstractions, tool integration, and the RAG pipeline.
+* **`langchain-community` / `langchain-classic`**: For specific retrievers like `BM25Retriever` and `EnsembleRetriever`.
 * **Google Gemini**: The Large Language Model used by the agents (via `langchain-google-genai`).
 * **Tavily AI**: For the web search tool (`langchain-tavily`).
+* **Vector Database (e.g., `ChromaDB`, `FAISS`)**: To store and index the RAG documents.
+* **`pypdf` (or similar)**: For loading and processing the `.pdf` documents for the RAG database.
 * **Python `dotenv`**: For managing API keys.
 * **`python-docx`**: For creating the final Word document.
 
