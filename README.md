@@ -6,6 +6,7 @@ Unlike a simple chatbot, this system simulates a team of specialized agents:
 * **Writer Agent**: Drafts the content based on the research.
 * **Controller Agent**: Critiques the draft, checks for errors, and requests revisions.
 * **Formatter Agent**: Formats the final, approved content into a `.docx` document.
+* **compile_research_node**: A node that runs after the research loop. It finds all the `ToolMessage` results and gathers their content into the `researcher_result` state key.
 
 The core of this project is its **self-correcting loop**, where the `Writer` and `Controller` agents work iteratively until the report meets a high-quality standard.
 
