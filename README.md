@@ -50,12 +50,26 @@ Here is a simplified diagram of the core self-correction loop:
 
 ```bash
 /homework_agent
+├── Database_for_RAG/
+│   ├── A Review of Prominent Paradigms for LLMBased_Agent_Tool_Use_Including_RAG_Planning_and_Feedback_Learning.pdf
+│   ├── A Survey on Large Language Model based Autonomous Agents.pdf
+│   ├── A Survey on the Memory Mechanism of Large Language Model based Agents.pdf
+│   ├── Augmented Language Models.pdf
+│   ├── The Rise and Potential of Large Language Model Based Agents.pdf
+│   └── Understanding the planning of LLM agents.pdf
+├── output/
+   ├── 'memory' means for an LLM agent.docx
+   ├── Generative AI in Healthcare.docx
+   ├── long_research_query.docx
+   ├── new_complex_query.docx
+   └── student_number_homeworkname.docx
 ├── main.ipynb                             # Main notebook to run the agent
 ├── workflow.py                            # Defines the StateGraph, nodes, and edges
 ├── nodes.py                               # Contains the functions for each agent (Researcher, Writer, etc.)
-├── tools.py                               # Initializes tools (e.g., TavilySearch)
+├── tools.py                               # Initializes tools (TavilySearch, RAG retriever)
 ├── long_research_query.docx               # An example result
-└── new_complex_query.docx                 # An example result
+└── new_complex_query.docx
+
 
 ```
 ### 3. How to Use
