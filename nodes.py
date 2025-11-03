@@ -4,18 +4,21 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from tools import tools
 from langchain_core.messages import ToolMessage
 
+#from langgraph.prebuilt import create_react_agent #this is old.
+from langchain.agents import create_agent
 from langgraph.prebuilt import ToolNode
 
-llm = ChatGoogleGenerativeAI(model = 'gemini-2.5-flash')
-llm_with_tools = llm.bind_tools(tools)
 
+llm = ChatGoogleGenerativeAI(model = 'gemini-2.5-flash')
+
+llm_with_tools = llm.bind_tools(tools)
 
 tool_node = ToolNode(tools)
 
 from workflow import HomeworkState
 def Researcher_agent(state: HomeworkState) -> HomeworkState:
     """This search agent node recieves the topic and decides to search it on web."""
-
+    
     print("--- RESEARCHER_agent WORKING ---")
     
     message = state['messages']
@@ -58,7 +61,7 @@ def compile_research_node(state: HomeworkState) -> HomeworkState:
 
     return {'researcher_result': compaile_results}
 
-from langchain.schema.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 def writer_agent(state: HomeworkState) -> HomeworkState: #google use docstring like this:
     """
 Runs the Writer Agent to synthesize an academic draft in Markdown.
@@ -163,44 +166,50 @@ def controller_agent(state: HomeworkState) ->HomeworkState:
     bool: A boolean with the key 'does_need_to_rewrite' it will say if there is hallucination or not.                    
     """
     print('---CONTROLLER IS RUNNING---')
-    researcher_result = state['researcher_result']
-    writer_result = state['writer_result']
+    current_count = state.get('rewriter_counter', 0)
+    print(f"--- Current rewrite count: {current_count} ---")
     
-    research_results = state['researcher_result'] # if you give this to llm directly it may not understand so we will give it more readable shape.
-    sources_text = "\n\n---\n\n".join(research_results)
-    
-    system_prompt = """You are an expert fact-checker and editor. Your task is to compare an academic paper
-    against its original sources. You must identify *any* statements in the paper that
-    are NOT supported by the sources (hallucinations) or contradict the sources.
-
-    If the paper is perfect and has NO hallucinations, you must respond with 
-    the single word: NONE
-    
-    If you find any hallucinations or unsupported claims, you MUST return a 
-    list of the specific mistakes."""
-    
-
-    user_prompt = f"""
-        Here are the research sources:
+    if current_count >= 3:
+        response_content = "NONE"
+    else:
+        researcher_result = state['researcher_result']
+        writer_result = state['writer_result']
         
-        <SOURCES>
-        {sources_text}
-        </SOURCES>
-        Here are the rewrited academic paper:
-        Here is the academic paper to check:
-        <PAPER>
-        {writer_result}
-        </PAPER>
+        research_results = state['researcher_result'] # if you give this to llm directly it may not understand so we will give it more readable shape.
+        sources_text = "\n\n---\n\n".join(research_results)
         
-        Remember: Respond with ONLY the word "NONE" if there are no errors. Otherwise, list the errors.
-        """
-    messages_for_llm = [
-            SystemMessage(content = system_prompt),
-            HumanMessage(content = user_prompt)
-        ]
+        system_prompt = """You are an expert fact-checker and editor. Your task is to compare an academic paper
+        against its original sources. You must identify *any* statements in the paper that
+        are NOT supported by the sources (hallucinations) or contradict the sources.
     
-    response = llm.invoke(messages_for_llm)
-    response_content = response.content.strip()
+        If the paper is perfect and has NO hallucinations, you must respond with 
+        the single word: NONE
+        
+        If you find any hallucinations or unsupported claims, you MUST return a 
+        list of the specific mistakes."""
+        
+    
+        user_prompt = f"""
+            Here are the research sources:
+            
+            <SOURCES>
+            {sources_text}
+            </SOURCES>
+            Here are the rewrited academic paper:
+            Here is the academic paper to check:
+            <PAPER>
+            {writer_result}
+            </PAPER>
+            
+            Remember: Respond with ONLY the word "NONE" if there are no errors. Otherwise, list the errors.
+            """
+        messages_for_llm = [
+                SystemMessage(content = system_prompt),
+                HumanMessage(content = user_prompt)
+            ]
+        
+        response = llm.invoke(messages_for_llm)
+        response_content = response.content.strip()
     
     if response_content == "NONE":
         print('---THERE IS NO ERROR.')
@@ -247,13 +256,28 @@ def should_contunie(state: HomeworkState) -> str:
 
     else:
         return 'compile'
-
+#this is a conditional edge function so it never upload a state so we have to use then= on edge part.
 def decide_to_rewrite(state: HomeworkState) -> str:
     """Reads the Auditor's decision and directs the flow."""
 
     
     if state.get('does_need_to_rewrite') == True:
+        current_rewriter_counter = state.get('rewriter_counter', 0)
+        
+        state['rewriter_counter'] = current_rewriter_counter + 1
         return 'rewrite'
     else:
         return 'format'
+
+def update_counter_node(state: HomeworkState) -> HomeworkState:
+    """Increments the rewriter counter by 1."""
+    print("---NODE: Updating rewrite counter---")
+    
+    # Get the current counter, default to 0 if it doesn't exist, then add 1
+    new_counter = state.get("rewriter_counter", 0) + 1
+    
+    # Return *only* the part of the state you want to change
+    return {"rewriter_counter": new_counter}
+
+    
 
