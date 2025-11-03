@@ -121,7 +121,7 @@ Here is a simplified diagram of the core self-correction loop:
 
 ## 🔮 Future Improvements
 
-* **Add RAG**: Integrate a vector database (`ChromaDB`, `FAISS`) to create a `document_search_tool`. This would allow the `Researcher_agent` to choose between searching the web (Tavily) or private documents (RAG).
+* **Add RAG**: Integrate a vector database (`ChromaDB`, `FAISS`) to create a `document_search_tool`. This would allow the `Researcher_agent` to choose between searching the web (Tavily) or private documents (RAG). (This is done.)
 * **Parallelization**: Modify the graph to run multiple research queries in parallel to speed up the information-gathering phase.
 
 * 
