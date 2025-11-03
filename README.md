@@ -25,7 +25,7 @@ The system operates on a state machine defined in `workflow.py`. The flow is as 
 
 Here is a simplified diagram of the core self-correction loop:
 
-<img width="318" height="702" alt="download" src="https://github.com/user-attachments/assets/b823d693-cc9d-4462-b569-94ad5fe46b1a" />
+<img width="378" height="777" alt="download" src="https://github.com/user-attachments/assets/ebf0aeb1-653a-4863-8499-d0ae43caf101" />
 
 
 ## ✨ Features
