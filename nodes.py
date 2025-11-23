@@ -217,6 +217,16 @@ def controller_agent(state: HomeworkState) ->HomeworkState:
         return {'does_need_to_rewrite':False, 'mistakes': ""}
         
     else:
+        print("\n\n################# HALLUCINATION DETECTED #################")
+        print("\n--- 1. ORIGINAL SOURCES (The Ground Truth) ---")
+        print(sources_text)
+        print("\n--- 2. FLAWED DRAFT (From Writer) ---")
+        print(writer_result)
+        print("\n--- 3. DETECTED MISTAKES (The Hallucination) ---")
+        print(response_content)
+        print("############################################################\n\n")
+
+        
         print('---CONTROLLER FIND SOME ERROR:---')
         print('---CONTROLLER IS FINISHED---')
         

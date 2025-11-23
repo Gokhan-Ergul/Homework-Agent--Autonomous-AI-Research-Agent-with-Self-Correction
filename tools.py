@@ -18,19 +18,30 @@ from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import pickle
 from langchain_core.tools import Tool
+import os
+import sys
 
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
 embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-file_path = 'all_chunk_data.pkl'
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+file_path = os.path.join(base_dir, 'all_chunk_data.pkl')
+db_path = os.path.join(base_dir, "rag_db")
+
+all_chunk = []
 
 try:
-    with open(file_path,'rb') as file:
+    with open(file_path, 'rb') as file:
         all_chunk = pickle.load(file)
+    print(f"✅ File uploaded successfully: {file_path}")
 except FileNotFoundError:
-    print(f"ERROR: File cound't find: {file_path}")
-
-
+    
+    error_msg = f"❌ CRITICAL ERROR: Pickle file not found! Searched location: {file_path}"
+    print(error_msg)
+    raise FileNotFoundError(error_msg)
+    
 
 
 DB_path = "rag_db"
@@ -61,6 +72,7 @@ custom_prompt = PromptTemplate(
 bm25_retriver = BM25Retriever.from_documents(
     documents=all_chunk
 )
+
 bm25_retriver.k = 7
 
 similarity_retriever = vector_db.as_retriever(
