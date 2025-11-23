@@ -31,33 +31,35 @@ Here is a simplified diagram of the core self-correction loop:
 
 ## ✨ Features
 
+* **Interactive Web UI**: A user-friendly interface built with **Streamlit** to visualize the agent's progress in real-time.
+* **FastAPI Backend**: Robust API architecture separating the agent logic from the user interface.
 * **Multi-Agent Collaboration**: Utilizes multiple specialized agents (nodes) working in concert.
 * **Self-Correction**: Implements a reflective loop where one agent critiques another, progressively improving the output quality.
 * **Advanced RAG Integration**: Employs a sophisticated hybrid retrieval system for deep contextual search.
     * **`BM25Retriever`**: For efficient, keyword-based (sparse) retrieval.
-    * **`EnsembleRetriever`**: Combines `BM25` with a semantic vector search (`SimilarityRetriever`) to get the best of both worlds.
-    * **`MultiQueryRetriever`**: Uses an LLM to generate multiple query variations, maximizing the chance of finding relevant documents (improving recall).
+    * **`EnsembleRetriever`**: Combines `BM25` with a semantic vector search (`SimilarityRetriever`).
+    * **`MultiQueryRetriever`**: Uses an LLM to generate multiple query variations to improve recall.
 * **Hybrid Research**: Dynamically uses both real-time web search (`TavilySearch`) and the private RAG database.
-* **Modular Architecture**: Cleanly separated logic into  `tools.py`, `nodes.py`, and `workflow.py` for easy maintenance and extension.
-* **Final Document Generation**: Automatically saves the final report as a `.docx` file using `python-docx`.
+* **Final Document Generation**: Automatically saves the final report as a `.docx` file.
   
 ## 🛠️ Tech Stack
 
-* **LangGraph**: The core library for building stateful, multi-agent applications.
-* **LangChain**: For core abstractions, tool integration, and the RAG pipeline.
-* **`langchain-community` / `langchain-classic`**: For specific retrievers like `BM25Retriever` and `EnsembleRetriever`.
-* **Google Gemini**: The Large Language Model used by the agents (via `langchain-google-genai`).
-* **Tavily AI**: For the web search tool (`langchain-tavily`).
-* **Vector Database (e.g., `ChromaDB`, `FAISS`)**: To store and index the RAG documents.
-* **`pypdf` (or similar)**: For loading and processing the `.pdf` documents for the RAG database.
-* **Python `dotenv`**: For managing API keys.
-* **`python-docx`**: For creating the final Word document.
+* **Frontend**: Streamlit (for the interactive Dashboard)
+* **Backend**: FastAPI (for the REST API)
+* **Core Logic**: LangGraph & LangChain
+* **LLM**: Google Gemini (via `langchain-google-genai`)
+* **Search**: Tavily AI
+* **Vector DB**: ChromaDB / FAISS
+* **Utilities**: `python-docx`, `pypdf`, `dotenv`
 
 ## 📂 Project Structure
 
 
 ```bash
 /homework_agent
+├── app/                         # FastAPI backend logic
+│   ├── main.py                  # API Entry point
+│   └── ...
 ├── Database_for_RAG/
 │   ├── A Review of Prominent Paradigms for LLMBased_Agent_Tool_Use_Including_RAG_Planning_and_Feedback_Learning.pdf
 │   ├── A Survey on Large Language Model based Autonomous Agents.pdf
@@ -71,6 +73,7 @@ Here is a simplified diagram of the core self-correction loop:
    ├── long_research_query.docx
    ├── new_complex_query.docx
    └── student_number_homeworkname.docx
+├── frontend.py                            # Streamlit User Interface
 ├── main.ipynb                             # Main notebook to run the agent
 ├── workflow.py                            # Defines the StateGraph, nodes, and edges
 ├── nodes.py                               # Contains the functions for each agent (Researcher, Writer, etc.)
@@ -80,48 +83,42 @@ Here is a simplified diagram of the core self-correction loop:
 
 
 ```
-### 3. How to Use
+## 🚀 How to Use
+
+You can run this project via the interactive Web UI or the Jupyter Notebook.
+
+### Option 1: Run the Web Application (Recommended)
+
+1.  **Start the Backend (FastAPI):**
+    Open a terminal and run the API server:
+    ```bash
+    uvicorn app.main:app --reload
+    ```
+
+2.  **Start the Frontend (Streamlit):**
+    Open a **new** terminal window and run:
+    ```bash
+    streamlit run frontend.py
+    ```
+
+3.  **Research:**
+    Open your browser (usually at `http://localhost:8501`). Enter your research topic, and watch the agents work in real-time!
+
+    ![Agent Interface Screenshot](path/to/your/screenshot.png)
+    *(Place your screenshot in the folder and update this path)*
+
+### Option 2: Run via Notebook (Dev Mode)
 
 1.  **Launch Jupyter Lab:**
     ```bash
     jupyter lab
     ```
-
-
-2.  **Open `main.ipynb`:**
-    Run the cells in the notebook.
-
-3.  **Provide a Complex Prompt:**
-    This agent is designed for complex, multi-step research tasks, not simple questions.
-
-    ❌ **Bad Prompt (Inefficient):**
-    ```python
-    # This will be very slow and inefficient for such a simple task.
-    user_input = HumanMessage(content='10 interview questions about machine learning.')
-    ```
-
-    ✅ **Good Prompt (Designed for this system):**
-    ```python
-    user_input = HumanMessage(
-        content="""
-        Write a 500-word report on the future of quantum computing.
-        1. Start with an introduction to qubits.
-        2. Explain at least 2 potential application areas.
-        3. Discuss the biggest technical challenges.
-        4. Conclude with a summary of its potential impact.
-        Use web search to find current information.
-        """
-    )
-    
-    response = app.invoke({'messages': [user_input]})
-    ```
+2.  **Open `main.ipynb`** and run the cells to execute the agent programmatically.
 
 4.  **Check the Output:**
     The agent will run for several minutes (this is normal due to the multiple LLM calls and self-correction loops). Once complete, you will find a `.docx` file (e.g., `student_number_homeworkname.docx`) in your directory with the full report.
 
 ## 🔮 Future Improvements
-
-* **Add RAG**: Integrate a vector database (`ChromaDB`, `FAISS`) to create a `document_search_tool`. This would allow the `Researcher_agent` to choose between searching the web (Tavily) or private documents (RAG). (This is done.)
-* **Parallelization**: Modify the graph to run multiple research queries in parallel to speed up the information-gathering phase.
-
-* 
+* Add a history tab to the Streamlit UI to view past reports.
+* Allow users to upload their own PDFs via the UI for the RAG system.
+* Dockerize the application for easier deployment.
